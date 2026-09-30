@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#050014">
+  <meta name="description" content="NEON FLAPPY 80s — Arcade 2D Boss Rush retrô futurista synthwave com combate por ondas e 5 chefões colossais.">
+  <title>NEON FLAPPY 80s — ARCADE BOSS RUSH</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Efeito Scanlines e Vinheta CRT -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <div class="crt-vignette" aria-hidden="true"></div>
+
+  <!-- Container Geral do Arcade -->
+  <div id="arcade-wrapper" class="arcade-wrapper">
+    <!-- Cabeçalho do Gabinete -->
+    <header class="arcade-marquee">
+      <div class="marquee-sub">80s SYNTHWAVE COMBAT</div>
+      <h1 class="marquee-title">NEON FLAPPY 80s</h1>
+      <div class="marquee-sub">ARCADE BOSS RUSH</div>
+    </header>
+
+    <!-- Bezel / Moldura da Tela -->
+    <div id="screen-container" class="screen-container">
+      <!-- Canvas Principal do Jogo -->
+      <canvas id="gameCanvas" width="960" height="600" aria-label="Arena de combate Neon Flappy 80s"></canvas>
+
+      <!-- HUD Integrado Superior -->
+      <div id="hud-top" class="hud-layer">
+        <div class="hud-box score-box">
+          <span class="hud-label">SCORE</span>
+          <span id="hud-score" class="hud-value neon-cyan">000000</span>
+        </div>
+        <div class="hud-box best-box">
+          <span class="hud-label">BEST</span>
+          <span id="hud-best" class="hud-value neon-pink">000000</span>
+        </div>
+        <div class="hud-box stage-box">
+          <span class="hud-label">STAGE</span>
+          <span id="hud-stage" class="hud-value neon-yellow">1</span>
+        </div>
+        <div class="hud-box wave-box">
+          <span class="hud-label">WAVE</span>
+          <span id="hud-wave" class="hud-value neon-cyan">1 / 3</span>
+        </div>
+        <div class="hud-box combo-box">
+          <span class="hud-label">COMBO</span>
+          <span id="hud-combo" class="hud-value neon-orange">x1</span>
+        </div>
+      </div>
+
+      <!-- Barra de Vida do Jogador e Dash Gauge -->
+      <div id="player-bars-container" class="player-bars-container">
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span class="bar-name">HP</span>
+            <span id="hp-text" class="bar-nums">100 / 100</span>
+          </div>
+          <div class="bar-frame hp-frame">
+            <div id="hp-bar-fill" class="bar-fill hp-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span class="bar-name">DASH</span>
+            <span id="dash-text" class="bar-nums">READY</span>
+          </div>
+          <div class="bar-frame dash-frame">
+            <div id="dash-bar-fill" class="bar-fill dash-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Vida Gigante do Chefão -->
+      <div id="boss-hud" class="boss-hud-overlay hidden">
+        <div class="boss-header">
+          <div class="boss-warning-tag">⚠️ DANGER BOSS DETECTED ⚠️</div>
+          <div id="boss-name" class="boss-name-text">NEON OVERLORD</div>
+          <div class="boss-phase-indicators">
+            <span id="phase-tag-1" class="phase-tag active">PHASE I</span>
+            <span id="phase-tag-2" class="phase-tag">PHASE II</span>
+            <span id="phase-tag-3" class="phase-tag">PHASE III</span>
+          </div>
+        </div>
+        <div class="boss-bar-frame">
+          <div id="boss-hp-fill" class="boss-bar-fill" style="width: 100%;"></div>
+          <div class="boss-hp-glow"></div>
+        </div>
+      </div>
+
+      <!-- Banner de Notificação Flutuante no Centro (Wave Clear, Alerta, etc.) -->
+      <div id="center-banner" class="center-banner-overlay hidden">
+        <div id="banner-title" class="banner-title-text">WAVE CLEAR</div>
+        <div id="banner-subtitle" class="banner-sub-text">PREPARE FOR NEXT WAVE</div>
+      </div>
+
+      <!-- Controles de Som e Pausa no topo direito -->
+      <div class="quick-controls">
+        <button id="btn-audio" class="retro-icon-btn" title="Alternar Som (Mute/Unmute)" aria-label="Som">
+          <span id="audio-icon">🔊</span>
+        </button>
+        <button id="btn-pause" class="retro-icon-btn" title="Pausar Jogo (ESC)" aria-label="Pausa">
+          <span>⏸️</span>
+        </button>
+      </div>
+
+      <!-- Menu Principal (Overlay) -->
+      <div id="menu-overlay" class="game-overlay">
+        <div class="menu-content">
+          <div class="menu-badge">100% ORIGINAL SYNTHWAVE BOSS RUSH</div>
+          <h2 class="menu-logo">NEON FLAPPY</h2>
+          <div class="menu-logo-sub">80s ARCADE BOSS RUSH</div>
+          <p class="menu-tagline">WAVES • BOSSES • POWER-UPS • SYNTH SOUNDS</p>
+
+          <div class="menu-instructions">
+            <div class="instruction-col">
+              <span class="key-tag">W A S D</span> ou <span class="key-tag">SETAS</span>
+              <p>Mover Nave Neon</p>
+            </div>
+            <div class="instruction-col">
+              <span class="key-tag">ESPAÇO</span> ou <span class="key-tag">CLIQUE</span>
+              <p>Disparar Canhões</p>
+            </div>
+            <div class="instruction-col">
+              <span class="key-tag">SHIFT</span>
+              <p>Dash com Invulnerabilidade</p>
+            </div>
+            <div class="instruction-col">
+              <span class="key-tag">ESC</span>
+              <p>Pausar Partida</p>
+            </div>
+          </div>
+
+          <div class="menu-features">
+            <span>🛡️ 5 FASES ÉPICAS</span> •
+            <span>👾 5 INIMIGOS ÚNICOS</span> •
+            <span>👑 5 CHEFÕES MULTI-FASE</span>
+          </div>
+
+          <button id="btn-start" class="btn-retro btn-start-pulse">
+            PRESS ENTER / SPACE TO START
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu de Pausa -->
+      <div id="pause-overlay" class="game-overlay hidden">
+        <div class="menu-content">
+          <h2 class="overlay-title neon-cyan">PAUSED</h2>
+          <p class="overlay-subtitle">SYSTEM SUSPENDED</p>
+          <div class="pause-buttons">
+            <button id="btn-resume" class="btn-retro">RESUME (ESC)</button>
+            <button id="btn-restart-pause" class="btn-retro btn-danger">RESTART</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu de Game Over -->
+      <div id="gameover-overlay" class="game-overlay hidden">
+        <div class="menu-content">
+          <h2 class="overlay-title neon-red glitch-text">GAME OVER</h2>
+          <p class="overlay-subtitle">SIGNAL LOST IN THE CYBER VOID</p>
+          
+          <div class="stats-card">
+            <div class="stat-line">
+              <span>FINAL SCORE:</span>
+              <span id="go-score" class="neon-cyan">000000</span>
+            </div>
+            <div class="stat-line">
+              <span>BEST SCORE:</span>
+              <span id="go-best" class="neon-pink">000000</span>
+            </div>
+            <div class="stat-line">
+              <span>HIGHEST STAGE:</span>
+              <span id="go-stage" class="neon-yellow">STAGE 1</span>
+            </div>
+          </div>
+
+          <button id="btn-retry" class="btn-retro btn-start-pulse">
+            PRESS SPACE TO RETRY
+          </button>
+        </div>
+      </div>
+
+      <!-- Menu de Vitória -->
+      <div id="victory-overlay" class="game-overlay hidden">
+        <div class="menu-content">
+          <div class="victory-crown">👑</div>
+          <h2 class="overlay-title neon-pink">YOU WIN!</h2>
+          <div class="menu-logo-sub neon-cyan">80s ARCADE CHAMPION</div>
+          <p class="overlay-subtitle">THE NEON CORE WAS DESTROYED</p>
+
+          <div class="stats-card victory-card">
+            <div class="stat-line">
+              <span>CHAMPION SCORE:</span>
+              <span id="vic-score" class="neon-cyan">000000</span>
+            </div>
+            <div class="stat-line">
+              <span>ALL TIME BEST:</span>
+              <span id="vic-best" class="neon-pink">000000</span>
+            </div>
+            <div class="stat-line">
+              <span>STATUS:</span>
+              <span class="neon-green">LEGENDARY ARCADE MASTER</span>
+            </div>
+          </div>
+
+          <button id="btn-play-again" class="btn-retro btn-start-pulse">
+            PRESS ENTER TO PLAY AGAIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles Virtuais Touch para Celular / Tablet -->
+      <div id="touch-controls" class="touch-controls-container" aria-label="Controles de toque virtuais">
+        <!-- D-Pad Direcional -->
+        <div class="touch-dpad">
+          <button id="touch-up" class="touch-btn dpad-btn dpad-up" aria-label="Cima">▲</button>
+          <div class="dpad-middle-row">
+            <button id="touch-left" class="touch-btn dpad-btn dpad-left" aria-label="Esquerda">◀</button>
+            <div class="dpad-center"></div>
+            <button id="touch-right" class="touch-btn dpad-btn dpad-right" aria-label="Direita">▶</button>
+          </div>
+          <button id="touch-down" class="touch-btn dpad-btn dpad-down" aria-label="Baixo">▼</button>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="touch-actions">
+          <button id="touch-dash" class="touch-btn action-btn btn-action-dash" aria-label="Dash">
+            <span>DASH</span>
+          </button>
+          <button id="touch-shoot" class="touch-btn action-btn btn-action-shoot" aria-label="Disparo">
+            <span>FIRE</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé do Gabinete com Detalhes Estilizados -->
+    <footer class="arcade-bottom-panel">
+      <div class="insert-coin-text">★ INSERT COIN TO GLORY ★ 198X SYNTH CORP ★</div>
+    </footer>
+  </div>
+
+  <!-- Script Principal do Jogo -->
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,840 @@
+/* ==========================================================================
+   NEON FLAPPY 80s — ARCADE BOSS RUSH (STYLE SHEET)
+   Identidade Visual: 80s Synthwave / Cyberpunk / Arcade Cabinet CRT
+   ========================================================================== */
+
+:root {
+  --neon-magenta: #ff00cc;
+  --neon-cyan: #00eaff;
+  --electric-violet: #7a00ff;
+  --radical-red: #ff2a6d;
+  --deep-purple: #12002b;
+  --void-obsidian: #050014;
+  --neon-yellow: #ffe600;
+  --neon-green: #00ff66;
+  --neon-orange: #ff7700;
+  
+  --font-retro: 'Courier New', 'Lucida Console', Monaco, monospace;
+  --font-display: 'Impact', 'Trebuchet MS', sans-serif;
+  --glow-cyan: 0 0 8px rgba(0, 234, 255, 0.8), 0 0 16px rgba(0, 234, 255, 0.4);
+  --glow-magenta: 0 0 8px rgba(255, 0, 204, 0.8), 0 0 16px rgba(255, 0, 204, 0.4);
+  --glow-red: 0 0 8px rgba(255, 42, 109, 0.8), 0 0 16px rgba(255, 42, 109, 0.4);
+}
+
+/* Reset básico e bloqueio de rolagem e zoom em celular */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--void-obsidian);
+  background-image: 
+    radial-gradient(circle at 50% 20%, #1e004a 0%, var(--void-obsidian) 70%),
+    linear-gradient(to bottom, #08001a, var(--void-obsidian));
+  color: #ffffff;
+  font-family: var(--font-retro);
+  touch-action: none;
+}
+
+/* ==========================================================================
+   EFEITOS CRT & SCANLINES
+   ========================================================================== */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 998;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.28) 50%
+  );
+  background-size: 100% 4px;
+  opacity: 0.65;
+}
+
+.crt-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.85), inset 0 0 160px rgba(5, 0, 20, 0.95);
+}
+
+/* ==========================================================================
+   ESTRUTURA GERAL DO GABINETE ARCADE
+   ========================================================================== */
+.arcade-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 10px;
+}
+
+.arcade-marquee {
+  text-align: center;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.marquee-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  letter-spacing: 4px;
+  color: #ffffff;
+  text-shadow: 
+    0 0 5px #ffffff,
+    0 0 10px var(--neon-cyan),
+    0 0 20px var(--neon-cyan),
+    0 0 35px var(--neon-magenta);
+}
+
+.marquee-sub {
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 6px var(--neon-magenta);
+  font-weight: bold;
+}
+
+/* Bezel e moldura da tela arcade */
+.screen-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 10;
+  background: #000000;
+  border-radius: 12px;
+  border: 3px solid #2a0845;
+  box-shadow: 
+    0 0 0 2px var(--electric-violet),
+    0 0 25px rgba(122, 0, 255, 0.5),
+    0 0 50px rgba(255, 0, 204, 0.3);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background-color: #050014;
+}
+
+/* ==========================================================================
+   HUD DO JOGO (CAMADA SUPERIOR)
+   ========================================================================== */
+.hud-layer {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-box {
+  display: flex;
+  flex-direction: column;
+  background: rgba(18, 0, 43, 0.7);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 234, 255, 0.3);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: bold;
+}
+
+.hud-value {
+  font-family: var(--font-retro);
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.neon-cyan {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+}
+.neon-pink {
+  color: var(--neon-magenta);
+  text-shadow: 0 0 8px var(--neon-magenta);
+}
+.neon-yellow {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px var(--neon-yellow);
+}
+.neon-red {
+  color: var(--radical-red);
+  text-shadow: 0 0 8px var(--radical-red);
+}
+.neon-orange {
+  color: var(--neon-orange);
+  text-shadow: 0 0 8px var(--neon-orange);
+}
+.neon-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 8px var(--neon-green);
+}
+
+/* ==========================================================================
+   BARRAS DO JOGADOR (HP E DASH)
+   ========================================================================== */
+.player-bars-container {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+  min-width: 220px;
+}
+
+.bar-group {
+  background: rgba(18, 0, 43, 0.75);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.bar-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.bar-name {
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.bar-nums {
+  color: var(--neon-cyan);
+}
+
+.bar-frame {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.12s ease-out;
+}
+
+.hp-fill {
+  background: linear-gradient(90deg, #ff2a6d, #ff00cc, #00eaff);
+  box-shadow: 0 0 10px var(--neon-magenta);
+}
+
+.dash-fill {
+  background: linear-gradient(90deg, #7a00ff, #00eaff);
+  box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* ==========================================================================
+   BARRA DO CHEFÃO (BOSS HUD OVERLAY)
+   ========================================================================== */
+.boss-hud-overlay {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78%;
+  max-width: 650px;
+  background: rgba(18, 0, 43, 0.85);
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 2px solid var(--radical-red);
+  box-shadow: 0 0 20px rgba(255, 42, 109, 0.5);
+  z-index: 12;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.boss-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.boss-warning-tag {
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: var(--radical-red);
+  font-weight: bold;
+  animation: blinkFast 0.8s infinite alternate;
+}
+
+.boss-name-text {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 
+    0 0 5px #fff,
+    0 0 10px var(--radical-red),
+    0 0 20px var(--neon-magenta);
+}
+
+.boss-phase-indicators {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.phase-tag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.phase-tag.active {
+  background: var(--radical-red);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 8px var(--radical-red);
+}
+
+.boss-bar-frame {
+  height: 16px;
+  background: #000;
+  border: 1px solid var(--radical-red);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.boss-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0055, #ff2a6d, #ffe600);
+  box-shadow: 0 0 14px var(--radical-red);
+  transition: width 0.15s ease-out;
+}
+
+/* ==========================================================================
+   BANNER CENTRAL FLUTUANTE (WAVE CLEAR, STAGE ADVANCE)
+   ========================================================================== */
+.center-banner-overlay {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(5, 0, 20, 0.9);
+  padding: 20px 40px;
+  border-radius: 8px;
+  border: 2px solid var(--neon-cyan);
+  box-shadow: 0 0 35px var(--neon-cyan);
+  z-index: 20;
+  pointer-events: none;
+  animation: bannerPop 0.3s ease-out;
+}
+
+.banner-title-text {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  letter-spacing: 4px;
+  color: #ffffff;
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-magenta);
+}
+
+.banner-sub-text {
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: var(--neon-yellow);
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   BOTÕES RÁPIDOS (SOM E PAUSA)
+   ========================================================================== */
+.quick-controls {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 30;
+}
+
+.retro-icon-btn {
+  background: rgba(18, 0, 43, 0.8);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1.1rem;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(0, 234, 255, 0.3);
+}
+
+.retro-icon-btn:hover {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 16px var(--neon-cyan);
+}
+
+/* ==========================================================================
+   MENUS E TELAS (MAIN MENU, PAUSE, GAME OVER, VICTORY)
+   ========================================================================== */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 0, 20, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  transition: opacity 0.25s ease;
+}
+
+.game-overlay.hidden,
+.boss-hud-overlay.hidden,
+.center-banner-overlay.hidden {
+  display: none !important;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 620px;
+  width: 100%;
+}
+
+.menu-badge {
+  font-size: 0.75rem;
+  letter-spacing: 2.5px;
+  color: var(--neon-yellow);
+  background: rgba(255, 230, 0, 0.12);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--neon-yellow);
+  margin-bottom: 12px;
+}
+
+.menu-logo {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  letter-spacing: 6px;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px #ffffff,
+    0 0 20px var(--neon-cyan),
+    0 0 40px var(--neon-magenta),
+    0 0 60px var(--neon-magenta);
+}
+
+.menu-logo-sub {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 4px;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 12px var(--neon-magenta);
+  margin-top: 4px;
+}
+
+.menu-tagline {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
+
+.menu-instructions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.instruction-col {
+  background: rgba(18, 0, 43, 0.8);
+  border: 1px solid rgba(0, 234, 255, 0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.key-tag {
+  display: inline-block;
+  background: var(--electric-violet);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 6px var(--neon-cyan);
+  margin-bottom: 4px;
+}
+
+.instruction-col p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.menu-features {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--neon-cyan);
+  margin-bottom: 24px;
+}
+
+/* Botões Retro Estilizados */
+.btn-retro {
+  font-family: var(--font-retro);
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: 2px solid var(--neon-cyan);
+  border-radius: 6px;
+  background: rgba(0, 234, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-retro:hover, .btn-retro:focus {
+  background: var(--neon-cyan);
+  color: #000000;
+  box-shadow: 0 0 25px var(--neon-cyan), 0 0 45px var(--neon-cyan);
+  transform: scale(1.03);
+}
+
+.btn-start-pulse {
+  animation: pulseGlow 1.4s infinite alternate;
+}
+
+.btn-danger {
+  border-color: var(--radical-red);
+  background: rgba(255, 42, 109, 0.15);
+  box-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
+}
+.btn-danger:hover {
+  background: var(--radical-red);
+  color: #fff;
+  box-shadow: 0 0 25px var(--radical-red);
+}
+
+.pause-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  letter-spacing: 5px;
+  margin-bottom: 4px;
+}
+
+.overlay-subtitle {
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 20px;
+}
+
+.stats-card {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(18, 0, 43, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.victory-crown {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  animation: bounce 1s infinite alternate ease-in-out;
+}
+
+/* ==========================================================================
+   CONTROLES TOUCH VIRTUAIS (MOBILE & TABLET)
+   ========================================================================== */
+.touch-controls-container {
+  display: none; /* Ativado via media query em telas touch/menores */
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  padding: 0 16px;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.touch-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.dpad-middle-row {
+  display: flex;
+  align-items: center;
+}
+
+.dpad-center {
+  width: 44px;
+  height: 44px;
+  background: rgba(18, 0, 43, 0.6);
+  border: 1px solid rgba(0, 234, 255, 0.2);
+}
+
+.touch-btn {
+  background: rgba(18, 0, 43, 0.75);
+  border: 2px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  font-family: var(--font-retro);
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.4);
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.08s ease;
+}
+
+.touch-btn:active, .touch-btn.active {
+  background: var(--neon-cyan);
+  color: #000;
+  box-shadow: 0 0 20px var(--neon-cyan);
+  transform: scale(0.92);
+}
+
+.dpad-btn {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.dpad-up { border-radius: 8px 8px 0 0; }
+.dpad-down { border-radius: 0 0 8px 8px; }
+.dpad-left { border-radius: 8px 0 0 8px; }
+.dpad-right { border-radius: 0 8px 8px 0; }
+
+.touch-actions {
+  display: flex;
+  gap: 14px;
+  pointer-events: auto;
+  margin-bottom: 8px;
+}
+
+.action-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action-shoot {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 234, 255, 0.5);
+}
+.btn-action-shoot:active, .btn-action-shoot.active {
+  background: var(--neon-cyan);
+  color: #000;
+}
+
+.btn-action-dash {
+  border-color: var(--neon-magenta);
+  color: var(--neon-magenta);
+  box-shadow: 0 0 12px rgba(255, 0, 204, 0.5);
+}
+.btn-action-dash:active, .btn-action-dash.active {
+  background: var(--neon-magenta);
+  color: #fff;
+}
+
+/* ==========================================================================
+   RODAPÉ DO GABINETE
+   ========================================================================== */
+.arcade-bottom-panel {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.insert-coin-text {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px var(--neon-yellow);
+  animation: blinkFast 1.2s infinite;
+}
+
+/* ==========================================================================
+   ANIMAÇÕES CSS
+   ========================================================================== */
+@keyframes blinkFast {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.35; }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
+    border-color: var(--neon-cyan);
+  }
+  100% {
+    box-shadow: 0 0 30px var(--neon-cyan), 0 0 50px var(--neon-magenta);
+    border-color: var(--neon-magenta);
+  }
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes bannerPop {
+  0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE E DISPOSITIVOS MÓVEIS
+   ========================================================================== */
+@media (max-width: 900px) {
+  .arcade-wrapper {
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .arcade-marquee {
+    margin-bottom: 2px;
+  }
+  .marquee-title {
+    font-size: 1.4rem;
+  }
+  .marquee-sub {
+    font-size: 0.6rem;
+  }
+  .screen-container {
+    border-radius: 0;
+    border-width: 2px;
+    max-width: 100vw;
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto;
+  }
+  .touch-controls-container {
+    display: flex;
+  }
+  .player-bars-container {
+    bottom: 95px;
+    left: 8px;
+    min-width: 160px;
+  }
+  .hud-layer {
+    gap: 6px;
+    top: 6px;
+    left: 8px;
+    right: 8px;
+    flex-wrap: wrap;
+  }
+  .hud-box {
+    padding: 2px 6px;
+  }
+  .hud-label {
+    font-size: 0.55rem;
+  }
+  .hud-value {
+    font-size: 0.85rem;
+  }
+  .boss-hud-overlay {
+    top: 45px;
+    width: 92%;
+    padding: 6px 10px;
+  }
+  .boss-name-text {
+    font-size: 1.1rem;
+  }
+  .menu-logo {
+    font-size: 2.2rem;
+  }
+  .menu-logo-sub {
+    font-size: 1.1rem;
+  }
+  .menu-instructions {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
